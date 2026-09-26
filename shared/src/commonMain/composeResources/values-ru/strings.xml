@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Открытые статьи</string>
+    <string name="title_articles">Статьи</string>
+    <string name="action_back">Назад</string>
+    <string name="error_not_found">Статья не найдена</string>
+</resources>

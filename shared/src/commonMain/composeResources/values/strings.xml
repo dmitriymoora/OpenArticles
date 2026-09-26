@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Open Articles</string>
+    <string name="title_articles">Articles</string>
+    <string name="action_back">Back</string>
+    <string name="error_not_found">Article not found</string>
+</resources>
