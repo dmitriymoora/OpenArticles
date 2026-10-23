@@ -1,46 +1,33 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM).
+# Открытые статьи (Compose Multiplatform)
 
-* [/iosApp](./iosApp/iosApp) contains an iOS application. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Каталог научных статей открытого доступа. Источник данных — [DOAJ](https://doaj.org) (Directory of Open Access Journals).
+В вехе В1 данные берутся из моков: 24 статьи с теми же полями, что приходят из API DOAJ.
 
-* [/shared](./shared/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./shared/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./shared/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./shared/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Курс «Кроссплатформенная разработка», ПИН-252т.
 
-### Running the apps
+## Запуск
 
-Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:
+```bash
+./gradlew :desktopApp:run
+./gradlew :webApp:wasmJsBrowserDevelopmentRun
+```
 
-- Android app: `./gradlew :androidApp:assembleDebug`
-- Desktop app:
-  - Hot reload: `./gradlew :desktopApp:hotRun --auto`
-  - Standard run: `./gradlew :desktopApp:run`
-- Web app:
-  - Wasm target (faster, modern browsers): `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
-  - JS target (slower, supports older browsers): `./gradlew :webApp:jsBrowserDevelopmentRun`
-- iOS app: open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+Проверка, что ключи строк совпадают в обеих локалях:
 
-### Running tests
+```bash
+python tools/check-strings.py
+```
 
-Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
+## Структура `shared/src/commonMain`
 
-- Android tests: `./gradlew :shared:testAndroidHostTest`
-- Desktop tests: `./gradlew :shared:jvmTest`
-- Web tests:
-  - Wasm target: `./gradlew :shared:wasmJsTest`
-  - JS target: `./gradlew :shared:jsTest`
-- iOS tests: `./gradlew :shared:iosSimulatorArm64Test`
-
----
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://kotlinlang.org/compose-multiplatform/),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
-
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+```
+App.kt          тема, язык, навигация (Navigation 3)
+domain/         модель Article, интерфейс ArticleRepository
+data/           моки и MockArticleRepository
+navigation/     sealed interface Screen
+theme/          цветовые схемы MaterialTheme
+locale/         смена языка ресурсов (expect/actual)
+ui/list/        список: состояние, намерения, ViewModel, экран
+ui/detail/      деталь: состояние, ViewModel, экран
+ui/components/  карточка статьи, шапка, форматирование
+```
