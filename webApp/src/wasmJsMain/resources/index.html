@@ -3,10 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenArticles</title>
+    <title>Open Articles</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
 </head>
 <body style="text-align: center; align-content: center">
+    <script>
+        // язык из приложения подставляем вместо языка браузера
+        var languagesDescriptor = Object.getOwnPropertyDescriptor(Navigator.prototype, "languages");
+        Object.defineProperty(Navigator.prototype, "languages", Object.assign({}, languagesDescriptor, {
+            get: function () {
+                return window.__customLocale ? [window.__customLocale] : languagesDescriptor.get.apply(this);
+            }
+        }));
+    </script>
     <script type="application/javascript" src="OpenArticles-webApp.js"></script>
 </body>
 </html>

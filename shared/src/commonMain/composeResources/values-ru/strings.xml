@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Открытые статьи</string>
-    <string name="title_articles">Статьи</string>
     <string name="action_back">Назад</string>
-    <string name="error_not_found">Статья не найдена</string>
+    <string name="action_toggle_theme">Сменить тему</string>
+    <string name="action_toggle_language">Сменить язык</string>
+    <string name="language_button">EN</string>
+    <string name="search_hint">Поиск по названию, автору или теме</string>
+    <string name="action_clear">Очистить</string>
+    <string name="nothing_found">Ничего не найдено</string>
+    <string name="article_not_found">Статья не найдена</string>
+    <string name="no_authors">Авторы не указаны</string>
+    <string name="authors_and_more">%1$s и ещё %2$d</string>
+    <string name="no_abstract">Аннотации нет</string>
+    <string name="section_abstract">Аннотация</string>
+    <string name="section_keywords">Ключевые слова</string>
+    <string name="section_more_from_journal">Ещё из этого журнала</string>
+    <string name="fact_journal">Журнал</string>
+    <string name="fact_publisher">Издатель</string>
+    <string name="fact_published">Опубликована</string>
+    <string name="fact_doi">DOI</string>
+    <string name="fact_issn">ISSN</string>
+    <string name="action_open_full_text">Читать полный текст</string>
 </resources>
