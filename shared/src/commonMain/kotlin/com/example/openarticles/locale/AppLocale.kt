@@ -12,7 +12,6 @@ expect object LocalAppLocale {
     infix fun provides(value: String?): ProvidedValue<*>
 }
 
-// ресурсы compose берут язык из системы, поэтому подменяем его и пересоздаём содержимое
 @Composable
 fun AppLocaleProvider(language: String, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalAppLocale provides language) {

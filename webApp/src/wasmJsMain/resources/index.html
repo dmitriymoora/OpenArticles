@@ -8,7 +8,6 @@
 </head>
 <body style="text-align: center; align-content: center">
     <script>
-        // язык из приложения подставляем вместо языка браузера
         var languagesDescriptor = Object.getOwnPropertyDescriptor(Navigator.prototype, "languages");
         Object.defineProperty(Navigator.prototype, "languages", Object.assign({}, languagesDescriptor, {
             get: function () {

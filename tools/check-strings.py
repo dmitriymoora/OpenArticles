@@ -1,11 +1,8 @@
-# сверка ключей строк между values и values-ru
-# запуск: python tools/check-strings.py
 import re
 import sys
 from pathlib import Path
 
 RES = Path(__file__).resolve().parent.parent / "shared/src/commonMain/composeResources"
-
 
 def load(folder):
     text = (RES / folder / "strings.xml").read_text(encoding="utf-8")
@@ -13,7 +10,6 @@ def load(folder):
     for name, value in re.findall(r'<string name="([^"]+)">(.*?)</string>', text, re.S):
         result[name] = sorted(re.findall(r"%\d+\$[sd]", value))
     return result
-
 
 base = load("values")
 ru = load("values-ru")

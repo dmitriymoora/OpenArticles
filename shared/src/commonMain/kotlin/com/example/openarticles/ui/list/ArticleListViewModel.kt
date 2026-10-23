@@ -33,7 +33,6 @@ class ArticleListViewModel(
 
     private fun search(query: String, withDelay: Boolean) {
         _state.update { it.copy(query = query) }
-        // старый поиск отменяем, иначе его ответ может прийти позже нового
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             if (withDelay) delay(SEARCH_DELAY_MS)

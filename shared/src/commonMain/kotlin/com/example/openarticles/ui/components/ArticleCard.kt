@@ -67,7 +67,6 @@ fun ArticleCard(
     }
 }
 
-// картинок у статей нет, поэтому заглушка с буквами журнала
 @Composable
 fun JournalAvatar(article: Article, modifier: Modifier = Modifier) {
     Box(

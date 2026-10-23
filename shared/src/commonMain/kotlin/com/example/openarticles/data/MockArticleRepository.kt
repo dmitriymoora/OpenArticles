@@ -31,7 +31,6 @@ class MockArticleRepository : ArticleRepository {
             keywords.any { it.contains(text, ignoreCase = true) }
 
     private companion object {
-        // чтобы было видно загрузку, как будто ходим в сеть
         const val FAKE_DELAY_MS = 400L
         const val RELATED_LIMIT = 5
     }

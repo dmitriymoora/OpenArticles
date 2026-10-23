@@ -34,7 +34,6 @@ fun App() {
     val repository: ArticleRepository = remember { MockArticleRepository() }
     var isDark by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf("ru") }
-    // стек и позиция списка лежат выше смены языка, чтобы не сбрасывались
     val backStack = remember { mutableStateListOf<Screen>(Screen.ArticleList) }
     val listState = rememberLazyListState()
 
