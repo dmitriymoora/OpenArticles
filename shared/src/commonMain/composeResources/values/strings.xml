@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Open Articles</string>
-    <string name="title_articles">Articles</string>
     <string name="action_back">Back</string>
-    <string name="error_not_found">Article not found</string>
+    <string name="action_toggle_theme">Toggle theme</string>
+    <string name="action_toggle_language">Change language</string>
+    <string name="language_button">RU</string>
+    <string name="search_hint">Search by title, author or topic</string>
+    <string name="action_clear">Clear</string>
+    <string name="nothing_found">Nothing found</string>
+    <string name="article_not_found">Article not found</string>
+    <string name="no_authors">No authors listed</string>
+    <string name="authors_and_more">%1$s and %2$d more</string>
+    <string name="no_abstract">No abstract</string>
+    <string name="section_abstract">Abstract</string>
+    <string name="section_keywords">Keywords</string>
+    <string name="section_more_from_journal">More from this journal</string>
+    <string name="fact_journal">Journal</string>
+    <string name="fact_publisher">Publisher</string>
+    <string name="fact_published">Published</string>
+    <string name="fact_doi">DOI</string>
+    <string name="fact_issn">ISSN</string>
+    <string name="action_open_full_text">Read full text</string>
 </resources>
