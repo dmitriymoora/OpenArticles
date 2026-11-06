@@ -12,9 +12,6 @@ actual object LocalAppLocale {
     private val default = NSLocale.preferredLanguages.first() as String
     private val LocalLocale = staticCompositionLocalOf { default }
 
-    actual val current: String
-        @Composable get() = LocalLocale.current
-
     @Composable
     actual infix fun provides(value: String?): ProvidedValue<*> {
         val locale = value ?: default

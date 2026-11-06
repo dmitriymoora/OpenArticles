@@ -9,9 +9,6 @@ import java.util.Locale
 actual object LocalAppLocale {
     private var default: Locale? = null
 
-    actual val current: String
-        @Composable get() = Locale.getDefault().toString()
-
     @Suppress("DEPRECATION")
     @Composable
     actual infix fun provides(value: String?): ProvidedValue<*> {

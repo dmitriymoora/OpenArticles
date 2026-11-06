@@ -12,9 +12,6 @@ external object window {
 actual object LocalAppLocale {
     private val LocalLocale = staticCompositionLocalOf { Locale.current }
 
-    actual val current: String
-        @Composable get() = LocalLocale.current.toString()
-
     @Composable
     actual infix fun provides(value: String?): ProvidedValue<*> {
         window.__customLocale = value?.replace('_', '-')
