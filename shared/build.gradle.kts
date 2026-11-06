@@ -13,6 +13,10 @@ composeCompiler {
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 kotlin {
     listOf(
         iosArm64(),
