@@ -8,4 +8,6 @@ sealed interface ArticleDetailState {
     data class Loaded(val article: Article, val related: List<Article>) : ArticleDetailState
 
     data object NotFound : ArticleDetailState
+
+    data class Error(val message: String) : ArticleDetailState
 }
