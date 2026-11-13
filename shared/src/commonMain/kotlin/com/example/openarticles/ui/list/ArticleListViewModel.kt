@@ -3,6 +3,7 @@ package com.example.openarticles.ui.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.openarticles.domain.ArticleRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ class ArticleListViewModel(
     private var searchJob: Job? = null
 
     init {
+        // Поле пустое; репозиторий подставит DEFAULT_SEARCH_QUERY
         search("", withDelay = false)
     }
 
@@ -28,6 +30,7 @@ class ArticleListViewModel(
         when (intent) {
             is ArticleListIntent.QueryChanged -> search(intent.query, withDelay = true)
             ArticleListIntent.QueryCleared -> search("", withDelay = false)
+            ArticleListIntent.Retry -> search(_state.value.query, withDelay = false)
         }
     }
 
@@ -37,8 +40,16 @@ class ArticleListViewModel(
         searchJob = viewModelScope.launch {
             if (withDelay) delay(SEARCH_DELAY_MS)
             _state.update { it.copy(content = ArticleListContent.Loading) }
-            val articles = repository.getArticles(query)
-            _state.update { it.copy(content = ArticleListContent.Loaded(articles)) }
+            try {
+                val articles = repository.getArticles(query)
+                _state.update { it.copy(content = ArticleListContent.Loaded(articles)) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(content = ArticleListContent.Error(e.message ?: "Network error"))
+                }
+            }
         }
     }
 

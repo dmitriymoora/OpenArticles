@@ -1,67 +1,69 @@
 # Открытые статьи (Compose Multiplatform)
 
-Каталог научных статей открытого доступа. Источник данных — [DOAJ](https://doaj.org) (Directory of Open Access Journals).
+Каталог научных статей открытого доступа.  
+Источник: [DOAJ](https://doaj.org) · API: [doaj.org/api/v4/docs](https://doaj.org/api/v4/docs).
 
 Курс «Кроссплатформенная разработка», группа ПИН-252т.  
-Веха **В1 — Каркас**, лабораторная **ЛР1 (CMP)**.
+Студент: **Дмитрий Моор**. Тема: **Статьи открытого доступа**.
 
-В этой вехе сети нет: 24 мок-статьи с теми же полями, что ожидаются от API на В2. Тема и язык живут только в памяти сессии.
+## Вехи
+
+| Веха | Лаба | Содержание |
+|------|------|------------|
+| В1 | ЛР1 | Каркас: тема, язык, Navigation 3, экраны из состояния, моки |
+| В2 | ЛР4 | Живые данные: Ktor, kotlinx.serialization, поиск DOAJ |
+
+Тема и язык только в памяти сессии (без диска). API-ключ не нужен.
 
 ## Запуск
 
-Ведущий таргет вехи — desktop:
+Desktop (ведущий таргет, **без** Hot Reload):
 
 ```bash
 ./gradlew :desktopApp:run
 ```
 
-Один раз бонусом можно проверить web:
+Android — из Android Studio (нужен `INTERNET` в манифесте).  
+Web (бонус):
 
 ```bash
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 ```
 
-Паритет ключей локализации (ru / en):
+Паритет строк ru/en:
 
 ```bash
 python tools/check-strings.py
 ```
 
-## Что сделано по ТЗ ЛР1
+### Замечание про ~600MB в Studio
 
-| Требование | Как закрыто |
-|------------|-------------|
-| Каркас не рассыпается при теме, языке, переходе список ↔ деталь | Состояние в `App` + Navigation 3 |
-| Моки ≥ 20, поля как у источника | 24 статьи в `MockArticles.kt`, модель `Article` |
-| Navigation 3, маршрут — объект | `sealed interface Screen` (`ArticleList` / `ArticleDetail(id)`) |
-| Сборка JetBrains `navigation3-ui` | `org.jetbrains.androidx.navigation3:navigation3-ui` |
-| Возврат выглядит как возврат | `popTransitionSpec`, `predictivePopTransitionSpec` |
-| Подписи в `composeResources`, обе локали | `values` + `values-ru`, скрипт сверки |
-| Тема из токенов `MaterialTheme` | `Theme.kt`, в UI только `colorScheme` |
-| Экран из состояния (state + колбэки) | `ArticleListScreen` / `ArticleDetailScreen` |
-| Отчёт Compose Compiler | `reportsDestination` в `shared/build.gradle.kts` |
+Compose Hot Reload качает JetBrains Runtime. Пока окно приложения открыто, Gradle-задача жива и может докачивать файл; закрытие окна обрывает закачку. Hot Reload в проекте отключён — используйте `:desktopApp:run`.
 
-### Что сознательно не делается (по ТЗ)
+## Подвох DOAJ
 
-- не покедекс и не чужой домен;
-- нет сохранения темы/языка на диск (это В3);
-- нет адаптива под ширину окна и мобильную вёрстку (В3);
-- нет deep links и привязки к адресной строке (В3);
-- не переводится содержимое каталога — только интерфейс.
+Без текста запроса API **не отдаёт список**.  
+В поле поиска UI может быть пусто; в сеть уходит дефолтный запрос `open access`, если строка пустая.
 
-## Структура `shared/src/commonMain`
+## Критерии ЛР4
+
+| Требование | Реализация |
+|------------|------------|
+| Корутины + StateFlow | ViewModel + `StateFlow` |
+| `CancellationException` не глотать | проброс в `catch` |
+| HTTP под Android / JVM / wasm | Ktor OkHttp / CIO / CIO-wasm |
+| DTO ≠ модель экрана, `ignoreUnknownKeys` | `data/remote` → mapper → `Article` |
+| Тяжёлая работа не на UI | `Dispatchers.Default` |
+| Экраны: state + колбэки | list / detail / journal |
+| Список, деталь, переход к журналу | Navigation 3, фильтр по ISSN |
+| Android сеть | `INTERNET` в `AndroidManifest` |
+
+## Структура данных в `shared`
 
 ```
-App.kt          тема, язык, навигация (Navigation 3)
-domain/         модель Article, интерфейс ArticleRepository
-data/           моки и MockArticleRepository
-navigation/     sealed interface Screen
-theme/          цветовые схемы MaterialTheme
-locale/         смена языка ресурсов (expect/actual)
-ui/list/        список: состояние, намерения, ViewModel, экран
-ui/detail/      деталь: состояние, ViewModel, экран
-ui/components/  карточка статьи, шапка, форматирование
-composeResources/  строки en (values) и ru (values-ru)
+domain/       Article, Journal, ArticleRepository
+data/remote/  DoajConfig, DTO, mapper, HttpClient (expect/actual), DoajArticleRepository
+data/         Mock* (не используется в App)
+ui/list|detail|journal/
+navigation/   ArticleList, ArticleDetail, JournalDetail
 ```
-
-Модуль `desktopApp` — тонкая оболочка окна; общий UI и логика в `shared`.

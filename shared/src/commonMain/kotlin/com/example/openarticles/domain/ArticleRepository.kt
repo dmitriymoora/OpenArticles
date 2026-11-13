@@ -6,4 +6,6 @@ interface ArticleRepository {
     suspend fun getArticle(id: String): Article?
 
     suspend fun getRelated(article: Article): List<Article>
+
+    suspend fun getJournal(issn: String): Journal?
 }
