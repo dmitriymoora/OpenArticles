@@ -32,7 +32,7 @@ class JournalDetailViewModel(
                     _state.value = JournalDetailState.NotFound
                     return@launch
                 }
-                val articles = repository.getArticles("issn:$issn")
+                val articles = repository.getArticlesPage("issn:$issn", skip = 0).articles
                 _state.value = JournalDetailState.Loaded(journal, articles)
             } catch (e: CancellationException) {
                 throw e

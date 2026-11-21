@@ -16,7 +16,11 @@ data class ArticleListState(
 sealed interface ArticleListContent {
     data object Loading : ArticleListContent
 
-    data class Loaded(val articles: List<Article>) : ArticleListContent
+    data class Loaded(
+        val articles: List<Article>,
+        val hasMore: Boolean,
+        val isLoadingMore: Boolean = false,
+    ) : ArticleListContent
 
     data class Error(val message: String) : ArticleListContent
 }
@@ -27,4 +31,6 @@ sealed interface ArticleListIntent {
     data object QueryCleared : ArticleListIntent
 
     data object Retry : ArticleListIntent
+
+    data object LoadMore : ArticleListIntent
 }

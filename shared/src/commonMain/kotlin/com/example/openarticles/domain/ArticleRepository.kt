@@ -1,7 +1,12 @@
 package com.example.openarticles.domain
 
+data class ArticlePage(
+    val articles: List<Article>,
+    val total: Int,
+)
+
 interface ArticleRepository {
-    suspend fun getArticles(query: String): List<Article>
+    suspend fun getArticlesPage(query: String, skip: Int = 0): ArticlePage
 
     suspend fun getArticle(id: String): Article?
 

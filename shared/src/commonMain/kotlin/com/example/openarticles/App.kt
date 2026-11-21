@@ -103,7 +103,7 @@ fun App() {
                                         onRelatedClick = { backStack.add(Screen.ArticleDetail(it)) },
                                         onOpenUrl = { uriHandler.openUri(it) },
                                         onJournalClick = { backStack.add(Screen.JournalDetail(it)) },
-                                        onRetry = viewModel::retry,
+                                        onRetry = viewModel::load,
                                     )
                                 }
                             }

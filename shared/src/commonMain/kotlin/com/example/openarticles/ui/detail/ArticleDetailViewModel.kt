@@ -21,9 +21,7 @@ class ArticleDetailViewModel(
         load()
     }
 
-    fun retry() = load()
-
-    private fun load() {
+    fun load() {
         viewModelScope.launch {
             _state.value = ArticleDetailState.Loading
             try {
