@@ -1,16 +1,18 @@
 package com.example.openarticles.data
 
 import com.example.openarticles.domain.Article
+import com.example.openarticles.domain.ArticlePage
 import com.example.openarticles.domain.ArticleRepository
 import com.example.openarticles.domain.Journal
 
 /** Оставлен для локальных экспериментов; в App используется DoajArticleRepository. */
 class MockArticleRepository : ArticleRepository {
 
-    override suspend fun getArticles(query: String): List<Article> {
+    override suspend fun getArticlesPage(query: String, skip: Int): ArticlePage {
         val text = query.trim()
-        if (text.isEmpty()) return mockArticles
-        return mockArticles.filter { it.matches(text) }
+        val filtered = if (text.isEmpty()) mockArticles else mockArticles.filter { it.matches(text) }
+        val page = filtered.drop(skip).take(PAGE_SIZE)
+        return ArticlePage(articles = page, total = filtered.size)
     }
 
     override suspend fun getArticle(id: String): Article? =
@@ -38,5 +40,6 @@ class MockArticleRepository : ArticleRepository {
 
     private companion object {
         const val RELATED_LIMIT = 5
+        const val PAGE_SIZE = 20
     }
 }
