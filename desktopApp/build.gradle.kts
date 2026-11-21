@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.hotReload)
+    // hotReload отключён: в Studio hotRun тянет JBR ~600MB и обрывается при закрытии окна приложения
 }
 
 kotlin {

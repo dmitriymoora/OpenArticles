@@ -14,19 +14,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.openarticles.domain.Article
 import com.example.openarticles.ui.components.ArticleCard
 import openarticles.shared.generated.resources.Res
 import openarticles.shared.generated.resources.action_clear
+import openarticles.shared.generated.resources.action_retry
 import openarticles.shared.generated.resources.nothing_found
 import openarticles.shared.generated.resources.search_hint
 import org.jetbrains.compose.resources.stringResource
@@ -53,8 +61,32 @@ fun ArticleListScreen(
                     if (content.articles.isEmpty()) {
                         CenterBox { Text(stringResource(Res.string.nothing_found)) }
                     } else {
-                        ArticleList(content.articles, listState, onArticleClick)
+                        ArticleList(
+                            articles = content.articles,
+                            listState = listState,
+                            hasMore = content.hasMore,
+                            isLoadingMore = content.isLoadingMore,
+                            onLoadMore = { onIntent(ArticleListIntent.LoadMore) },
+                            onArticleClick = onArticleClick,
+                        )
                     }
+                is ArticleListContent.Error -> CenterBox {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.padding(24.dp),
+                    ) {
+                        Text(
+                            text = content.message,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                        Button(onClick = { onIntent(ArticleListIntent.Retry) }) {
+                            Text(stringResource(Res.string.action_retry))
+                        }
+                    }
+                }
             }
         }
     }
@@ -88,8 +120,24 @@ private fun SearchField(
 private fun ArticleList(
     articles: List<Article>,
     listState: LazyListState,
+    hasMore: Boolean,
+    isLoadingMore: Boolean,
+    onLoadMore: () -> Unit,
     onArticleClick: (String) -> Unit,
 ) {
+    val shouldLoadMore by remember(listState, articles.size, hasMore, isLoadingMore) {
+        derivedStateOf {
+            if (!hasMore || isLoadingMore || articles.isEmpty()) return@derivedStateOf false
+            val info = listState.layoutInfo
+            val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: return@derivedStateOf false
+            lastVisible >= articles.lastIndex - LOAD_MORE_THRESHOLD
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) onLoadMore()
+    }
+
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
@@ -97,6 +145,18 @@ private fun ArticleList(
     ) {
         items(articles, key = { it.id }) { article ->
             ArticleCard(article = article, onClick = onArticleClick)
+        }
+        if (isLoadingMore) {
+            item(key = "loading-more") {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }
@@ -107,3 +167,5 @@ private fun CenterBox(content: @Composable () -> Unit) {
         content()
     }
 }
+
+private const val LOAD_MORE_THRESHOLD = 3

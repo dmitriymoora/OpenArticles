@@ -1,5 +1,6 @@
 package com.example.openarticles.ui.detail
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,15 +25,19 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.openarticles.domain.Article
 import com.example.openarticles.ui.components.ArticleCard
 import com.example.openarticles.ui.components.publishedDate
 import openarticles.shared.generated.resources.Res
 import openarticles.shared.generated.resources.action_open_full_text
+import openarticles.shared.generated.resources.action_open_journal
+import openarticles.shared.generated.resources.action_retry
 import openarticles.shared.generated.resources.article_not_found
 import openarticles.shared.generated.resources.fact_doi
 import openarticles.shared.generated.resources.fact_issn
@@ -51,6 +56,8 @@ fun ArticleDetailScreen(
     state: ArticleDetailState,
     onRelatedClick: (String) -> Unit,
     onOpenUrl: (String) -> Unit,
+    onJournalClick: (String) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -61,11 +68,28 @@ fun ArticleDetailScreen(
             ArticleDetailState.NotFound ->
                 Text(stringResource(Res.string.article_not_found), Modifier.align(Alignment.Center))
 
+            is ArticleDetailState.Error ->
+                Column(
+                    modifier = Modifier.align(Alignment.Center).padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        text = state.message,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                    )
+                    Button(onClick = onRetry) {
+                        Text(stringResource(Res.string.action_retry))
+                    }
+                }
+
             is ArticleDetailState.Loaded -> ArticleContent(
                 article = state.article,
                 related = state.related,
                 onRelatedClick = onRelatedClick,
                 onOpenUrl = onOpenUrl,
+                onJournalClick = onJournalClick,
             )
         }
     }
@@ -78,6 +102,7 @@ private fun ArticleContent(
     related: List<Article>,
     onRelatedClick: (String) -> Unit,
     onOpenUrl: (String) -> Unit,
+    onJournalClick: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -94,11 +119,18 @@ private fun ArticleContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(4.dp))
-        ArticleFacts(article)
+        ArticleFacts(article = article, onJournalClick = onJournalClick)
+
+        val issn = article.issn
+        if (issn != null) {
+            TextButton(onClick = { onJournalClick(issn) }) {
+                Text(stringResource(Res.string.action_open_journal))
+            }
+        }
 
         val url = article.fullTextUrl
         if (url != null) {
-            Button(onClick = { onOpenUrl(url) }, modifier = Modifier.padding(top = 8.dp)) {
+            Button(onClick = { onOpenUrl(url) }, modifier = Modifier.padding(top = 4.dp)) {
                 Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(Res.string.action_open_full_text))
@@ -130,9 +162,21 @@ private fun ArticleContent(
 }
 
 @Composable
-private fun ArticleFacts(article: Article) {
+private fun ArticleFacts(
+    article: Article,
+    onJournalClick: (String) -> Unit,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        FactRow(stringResource(Res.string.fact_journal), article.journalTitle)
+        val issn = article.issn
+        if (issn != null && article.journalTitle.isNotEmpty()) {
+            FactRow(
+                label = stringResource(Res.string.fact_journal),
+                value = article.journalTitle,
+                onClick = { onJournalClick(issn) },
+            )
+        } else {
+            FactRow(stringResource(Res.string.fact_journal), article.journalTitle)
+        }
         if (article.publisher.isNotEmpty()) {
             FactRow(stringResource(Res.string.fact_publisher), article.publisher)
         }
@@ -145,7 +189,11 @@ private fun ArticleFacts(article: Article) {
 }
 
 @Composable
-private fun FactRow(label: String, value: String) {
+private fun FactRow(
+    label: String,
+    value: String,
+    onClick: (() -> Unit)? = null,
+) {
     Row {
         Text(
             text = label,
@@ -154,7 +202,12 @@ private fun FactRow(label: String, value: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         SelectionContainer {
-            Text(value, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (onClick != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                modifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
+            )
         }
     }
 }
